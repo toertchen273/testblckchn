@@ -3,6 +3,9 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { Wallet } from "./Wallet";
 
 export const metadata: Metadata = {
   title: "BlackRock Token",
@@ -16,6 +19,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <Wallet>
+      <ToastContainer/>
+      </Wallet>
       <body className={inter.className}>{children}</body>
     </html>
   );

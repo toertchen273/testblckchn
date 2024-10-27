@@ -48,6 +48,10 @@ import {
 } from "@solana/spl-token";
 import { render } from "@/render";
 import { calculateStakeEntryPda } from "../../../program/pda";
+import { sendAndConfirmRawTransaction, Transaction } from "@solana/web3.js";
+import { toast } from "react-toastify";
+import { connection } from "../../../interaction/environment";
+import { claimReward, getErrorMessageFromFormattedString, getWalletStakes, initStakePool, stakeTokens, TOKEN_ADDRESS, TOKEN_LAMPORTS, unstakeTokens } from "../../../interaction/staking-func";
 require("@solana/wallet-adapter-react-ui/styles.css");
 //import '../public/demos/photographer/css/fonts.css'
 
@@ -64,7 +68,12 @@ export interface ITokenBalance {
 
 export default function Home() {
   const { publicKey, connected } = useWallet();
-  
+  const [stakeAmount, setStakeAmount] = useState<number>(0);
+  const [unstakeAmount, setUnstakeAmount] = useState<number>(0)
+  const [userStakeData, setUserStakeData] = useState<any>();
+  const [refetch, setRefetch] = useState<boolean>(false);
+  const [userTxns, setUserTxns] = useState<any>()
+
   function getProgram({ wallet }: any) {
     const provider = new AnchorProvider(AppState.connection, wallet, {});
     return new Program(artifacts.IDL, STAKING_PROGRAM_ID, provider);     //ABI , ADDRESS, RPC
@@ -73,7 +82,7 @@ export default function Home() {
   const adapter = useAnchorWallet();
 
   // const program = new Program<artifacts.WmpStaking>(artifacts.IDL, STAKING_PROGRAM_ID);
-  const stakeIBIT = async () => {
+  const stakeBCT = async () => {
     const program = getProgram({ wallet });
     let amount = parseFloat(
       (document.getElementById("stake_input") as HTMLInputElement).value
@@ -84,10 +93,10 @@ export default function Home() {
       let stakeEntry = await program.account.stakeEntry.fetchNullable(stakeEntryAddress);
       let tx = new web3.Transaction();
       if (stakeEntry == null) {
-          let stakeEntryIx = await createStakeEntryIx(publicKey, AppState.stakePoolAddress);
-          tx.add(stakeEntryIx);
+        let stakeEntryIx = await createStakeEntryIx(publicKey, AppState.stakePoolAddress);
+        tx.add(stakeEntryIx);
       }
-    let stakeIx = await createStakeIx(
+      let stakeIx = await createStakeIx(
         publicKey,
         AppState.tokenAAddress,
         tokenAmount(amount),
@@ -100,7 +109,7 @@ export default function Home() {
     }
   };
 
-  const unstakeIBIT = async () => {
+  const unstakeBCT = async () => {
     let amount = parseFloat(
       (document.getElementById("unstake_input") as HTMLInputElement).value
     );
@@ -110,7 +119,7 @@ export default function Home() {
         publicKey,
         AppState.tokenAAddress,
         tokenAmount(amount),
-        AppState. stakePoolAddress
+        AppState.stakePoolAddress
       );
       tx.add(unstakeIx);
       let hash = await sendTransaction(tx, publicKey, adapter, AppState.connection);
@@ -166,7 +175,7 @@ export default function Home() {
   const navItems = [
     {
       href: "/index.html",
-      title: "IBIT TOKEN",
+      title: "BCT TOKEN",
     },
     {
       href: "#",
@@ -185,7 +194,7 @@ export default function Home() {
       title: "\u00A0\u00A0\u00A0\u00A0Wallets",
     },
     {
-      href: "/WPIBIT.pdf",
+      href: "/WPBCT.pdf",
       title: "\u00A0\u00A0\u00A0\u00A0Unser Whitepaper",
     },
     {
@@ -194,14 +203,14 @@ export default function Home() {
     },
     {
       href: "/wallet.html",
-      title: "\u00A0\u00A0\u00A0\u00A0IBIT Token staken",
+      title: "\u00A0\u00A0\u00A0\u00A0BCT Token staken",
     },
     {
       href: "/roadmap.html#roadmaprmpage",
       title: "ROADMAP",
     },
     {
-      href: "/index.html#faqibit",
+      href: "/index.html#faqBCT",
       title: "FAQS",
     },
     {
@@ -211,6 +220,109 @@ export default function Home() {
   ];
 
   const [isOpen, setIsOpen] = useState(false);
+
+  const stakePool = async () => {
+    try {
+      if (!wallet) {
+        toast.error("Please connect wallet");
+        return
+      }
+
+      if (wallet) {
+        const tx: Transaction | undefined = await stakeTokens(wallet, stakeAmount);
+
+        if (!tx) {
+          return
+        }
+        tx.feePayer = wallet.publicKey
+        tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash
+        const signedTx = await wallet.signTransaction(tx)
+        const txId = await sendAndConfirmRawTransaction(connection, signedTx.serialize())
+        toast.success("Tokens Staked")
+        console.log('signature', txId)
+        setRefetch(!refetch)
+      }
+    } catch (e: any) {
+      console.log(e)
+      const error = getErrorMessageFromFormattedString(e.message)
+      toast.error(error)
+    }
+  }
+
+  const unstakePool = async () => {
+    try {
+      if (!wallet) {
+        toast.error("Please connect wallet");
+        return
+      }
+
+      if (wallet) {
+        const tx: Transaction | undefined = await unstakeTokens(wallet, unstakeAmount);
+
+        if (!tx) {
+          return
+        }
+        tx.feePayer = wallet.publicKey
+        tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash
+        const signedTx = await wallet.signTransaction(tx)
+        const txId = await sendAndConfirmRawTransaction(connection, signedTx.serialize())
+        toast.success("Tokens unstaked")
+        console.log('signature', txId)
+        setRefetch(!refetch)
+      }
+    } catch (e: any) {
+      console.log(e)
+      const error = getErrorMessageFromFormattedString(e.message)
+      toast.error(error)
+    }
+  }
+
+  const claimPool = async () => {
+    try {
+      if (!wallet) {
+        toast.error("Please connect wallet");
+        return
+      }
+
+      if (wallet) {
+        const tx: Transaction | undefined = await claimReward(wallet);
+
+        if (!tx) {
+          return
+        }
+        tx.feePayer = wallet.publicKey
+        tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash
+        const signedTx = await wallet.signTransaction(tx)
+        const txId = await sendAndConfirmRawTransaction(connection, signedTx.serialize())
+        toast.success("Tokens Claimed")
+        console.log('signature', txId)
+        // setRefetch(!refetch)
+      }
+    } catch (e: any) {
+      console.log(e)
+      const error = getErrorMessageFromFormattedString(e.message)
+      toast.error(error)
+    }
+  }
+
+  function formatTimestamp(timestamp: number) {
+    // Create a new Date object from the timestamp
+    const date = new Date(timestamp*1000);
+
+    // Options for formatting the date and time
+    const options: any = {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false, // Use 24-hour format
+    };
+
+    // Format the date and time
+    return date.toLocaleString('en-US', options);
+  }
 
   useEffect(() => {
     // Hide mobile menu when a link is clicked
@@ -243,6 +355,44 @@ export default function Home() {
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+
+  useEffect(() => {
+    (async () => {
+      if (!wallet) return
+
+      const userData = await getWalletStakes(wallet!);
+      setUserStakeData(userData[0])
+    })()
+  }, [wallet, refetch])
+
+  useEffect(() => {
+    (async () => {
+      if (!userStakeData) return
+      if (!wallet) return
+      const signs = await connection.getSignaturesForAddress(userStakeData?.publicKey, { limit: 10 });
+      const filteredTxns = signs?.filter((item) => !item.err)
+      const signatures = filteredTxns.map(item => item.signature);
+      const txs = await connection.getTransactions(signatures);
+  
+  
+      let txData: any[] = [];
+  
+      txs.forEach((tx) => {
+        const preBalance: any = tx?.meta?.preTokenBalances?.filter((item) => item.owner == wallet.publicKey.toString())[0].uiTokenAmount.uiAmount;
+        const postBalance: any = tx?.meta?.postTokenBalances?.filter((item) => item.owner == wallet.publicKey.toString())[0].uiTokenAmount.uiAmount;
+  
+        const data = { timestamp: tx?.blockTime, type: preBalance > postBalance ? "Stake" : "unstake", amount: postBalance - preBalance }
+        txData.push(data)
+  
+      })
+  
+      setUserTxns(txData)
+    })();
+  }, [userStakeData])
+  
+
+  console.log(userTxns)
 
   return (
     <div id="wrapper" className="clearfix">
@@ -332,7 +482,7 @@ export default function Home() {
                 <div id="logo">
                   <a href="/index.html/" style={{ color: "#000" }}>
                     {" "}
-                    BlackRock Token{" "}
+                    BlackChain Token{" "}
                   </a>
                 </div>
                 {/* #logo end */}
@@ -356,7 +506,7 @@ export default function Home() {
                   <ul className="menu-container">
                     <li className="menu-item">
                       <a className="menu-link" href="index.html">
-                        <div>IBIT Token</div>
+                        <div>BCT Token</div>
                       </a>
                     </li>
                     <li className="menu-item mega-menu current">
@@ -427,7 +577,7 @@ export default function Home() {
                               </div>
                             </a>
                             <a
-                              href="WPIBIT.pdf"
+                              href="WPBCT.pdf"
                               className="mega-menu-column sub-menu-container col-lg-4 border-bottom h-bg-light py-4"
                             >
                               <div className="feature-box">
@@ -486,7 +636,7 @@ export default function Home() {
                                 </div>
                                 <div className="fbox-content">
                                   <h3 className="text-transform-none ls-0">
-                                    IBIT Token staken
+                                    BCT Token staken
                                   </h3>
                                   <p>
                                     Entdecke das Stakingdashboard und nimm hier
@@ -508,7 +658,7 @@ export default function Home() {
                       </a>
                     </li>
                     <li className="menu-item">
-                      <a className="menu-link" href="index.html#faqibit">
+                      <a className="menu-link" href="index.html#faqBCT">
                         <div>FAQs</div>
                       </a>
                     </li>
@@ -556,41 +706,41 @@ export default function Home() {
               <div className="stat-item" id="stake-entry-data">
                 <p>Total staked</p>
                 <h3>
-                  <span id="stake-amount"></span> IBIT
+                  <span id="stake-amount"></span> {userStakeData ? Number(userStakeData?.account?.amount) / TOKEN_LAMPORTS : 0} BCT
                 </h3>
               </div>
               <div className="stat-item">
                 <p>Available</p>
                 <h3>
-                  <span id="estimated-rewards"></span> IBIT
+                  <span id="estimated-rewards"></span> BCT
                 </h3>
               </div>
               <div className="stat-item">
                 <p>Total rewards</p>
                 <h3>
-                  <span id="claimed-rewards"></span>IBIT
+                  <span id="claimed-rewards"></span> {userStakeData ? Number(userStakeData?.account?.rewards)/ TOKEN_LAMPORTS : 0} BCT
                 </h3>
               </div>
               <div className="stat-item">
                 <p>24h Rewards</p>
                 <h3>
-                  <span id="estimated-rewards-24h"></span> IBIT
+                  <span id="estimated-rewards-24h"></span> BCT
                 </h3>
               </div>
             </div>
             <div className="action-buttons">
               <div className="action-button-wrap">
-                <input type="number" id="stake_input" />
-                <button className="stake-button" id="stake" onClick={stakeIBIT}>
+                <input type="number" id="stake_input" value={stakeAmount} onChange={(e) => { setStakeAmount(parseFloat(e.target.value)) }} />
+                <button className="stake-button" id="stake" onClick={stakePool}>
                   Stake
                 </button>
               </div>
               <div className="action-button-wrap">
-                <input type="number" id="unstake_input" />
+                <input type="number" id="unstake_input" value={unstakeAmount} onChange={(e) => { setUnstakeAmount(parseFloat(e.target.value)) }} />
                 <button
                   className="unstake-button"
                   id="unstake"
-                  onClick={unstakeIBIT}
+                  onClick={unstakePool}
                 >
                   Unstake
                 </button>
@@ -599,7 +749,7 @@ export default function Home() {
                 <button
                   className="stake-button"
                   id="claimrewards"
-                  onClick={getRewards}
+                  onClick={claimPool}
                 >
                   Rewards auszahlen
                 </button>
@@ -611,31 +761,31 @@ export default function Home() {
                   <div className="statitem">
                     <h3>Momentane monatliche Returns</h3>
                     <p id="current-monthly-return">
-                      11.96% | <span id="monthly-a-amount"></span> IBIT
+                      11.96% | <span id="monthly-a-amount"></span> BCT
                     </p>
                   </div>
                   <div className="statitem">
                     <h3>voraussichtliche tägliche Returns</h3>
                     <p id="expected-daily-return">
-                      0.398% | <span id="daily-a-amount"></span> IBIT
+                      0.398% | <span id="daily-a-amount"></span> BCT
                     </p>
                   </div>
                   <div className="statitem">
                     <h3>voraussichtliche wöchentliche Returns</h3>
                     <p id="expected-weekly-return">
-                      2.79% | <span id="weekly-a-amount"></span> IBIT
+                      2.79% | <span id="weekly-a-amount"></span> BCT
                     </p>
                   </div>
                   <div className="statitem">
                     <h3>voraussichtliche jährliche Returns</h3>
                     <p id="expected-yearly-return">
-                      145.11% | <span id="yearly-a-amount"></span> IBIT
+                      145.11% | <span id="yearly-a-amount"></span> BCT
                     </p>
                   </div>
                   <div className="statitem" id="token-a-data">
                     <h3>verfügbare Token in deiner Wallet</h3>
                     <p id="expected-monthly-return">
-                      <span id="a-amount"></span> IBIT
+                      <span id="a-amount"></span> BCT
                     </p>
                   </div>
                   <div className="statitem">
@@ -655,81 +805,13 @@ export default function Home() {
                     </tr>
                   </thead>
                   <tbody>
-                    <tr>
-                      <td className="date"></td>
-                      <td></td>
-                      <td></td>
-                    </tr>
-                    <tr>
-                      <td className="date"></td>
-                      <td></td>
-                      <td></td>
-                    </tr>
-                    <tr>
-                      <td className="date"></td>
-                      <td></td>
-                      <td></td>
-                    </tr>
-                    <tr>
-                      <td className="date"></td>
-                      <td> </td>
-                      <td> </td>
-                    </tr>
-                    <tr>
-                      <td className="date"></td>
-                      <td> </td>
-                      <td> </td>
-                    </tr>
-                    <tr>
-                      <td className="date"></td>
-                      <td> </td>
-                      <td> </td>
-                    </tr>
-                    <tr>
-                      <td className="date"></td>
-                      <td> </td>
-                      <td> </td>
-                    </tr>
-                    <tr>
-                      <td className="date"></td>
-                      <td> </td>
-                      <td> </td>
-                    </tr>
-                    <tr>
-                      <td className="date"></td>
-                      <td> </td>
-                      <td> </td>
-                    </tr>
-                    <tr>
-                      <td className="date"></td>
-                      <td> </td>
-                      <td> </td>
-                    </tr>
-                    <tr>
-                      <td className="date"></td>
-                      <td> </td>
-                      <td> </td>
-                    </tr>
-                    <tr>
-                      <td className="date"></td>
-                      <td> </td>
-                      <td> </td>
-                    </tr>
-                    <tr>
-                      <td className="date"></td>
-                      <td> </td>
-                      <td> </td>
-                    </tr>
-                    <tr>
-                      <td className="date"></td>
-                      <td> </td>
-                      <td> </td>
-                    </tr>
-                    <tr>
-                      <td className="date"></td>
-                      <td> </td>
-                      <td> </td>
-                    </tr>
+                    {userTxns ? userTxns.map((tx:any, i:number) => (
+                      <tr key={i}>
+                        <td className="date">{formatTimestamp(tx.timestamp)}</td>
+                        <td>{tx.type}</td>
+                        <td>{tx.amount}</td>
+                      </tr>
+                    )) : null}
                   </tbody>
                 </table>
               </div>

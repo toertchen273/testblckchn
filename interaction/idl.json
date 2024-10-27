@@ -1,0 +1,546 @@
+{
+    "version": "0.1.0",
+    "name": "staking",
+    "instructions": [
+        {
+            "name": "initPool",
+            "accounts": [
+                {
+                    "name": "stakePool",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "escrowFee",
+                    "isMut": false,
+                    "isSigner": false
+                },
+                {
+                    "name": "poolTokenAccount",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "escrowTokenAccount",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "mint",
+                    "isMut": false,
+                    "isSigner": false
+                },
+                {
+                    "name": "payerTokenAccount",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "payer",
+                    "isMut": true,
+                    "isSigner": true
+                },
+                {
+                    "name": "tokenProgram",
+                    "isMut": false,
+                    "isSigner": false
+                },
+                {
+                    "name": "associatedTokenProgram",
+                    "isMut": false,
+                    "isSigner": false
+                },
+                {
+                    "name": "systemProgram",
+                    "isMut": false,
+                    "isSigner": false
+                }
+            ],
+            "args": [
+                {
+                    "name": "amount",
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "withdrawTokens",
+            "accounts": [
+                {
+                    "name": "stakePool",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "poolTokenAccount",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "stakeMint",
+                    "isMut": false,
+                    "isSigner": false
+                },
+                {
+                    "name": "user",
+                    "isMut": true,
+                    "isSigner": true
+                },
+                {
+                    "name": "userTokenAccount",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "tokenProgram",
+                    "isMut": false,
+                    "isSigner": false
+                },
+                {
+                    "name": "associatedTokenProgram",
+                    "isMut": false,
+                    "isSigner": false
+                },
+                {
+                    "name": "systemProgram",
+                    "isMut": false,
+                    "isSigner": false
+                }
+            ],
+            "args": [
+                {
+                    "name": "amount",
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "depositeTokens",
+            "accounts": [
+                {
+                    "name": "stakePool",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "poolTokenAccount",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "stakeMint",
+                    "isMut": false,
+                    "isSigner": false
+                },
+                {
+                    "name": "user",
+                    "isMut": true,
+                    "isSigner": true
+                },
+                {
+                    "name": "userTokenAccount",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "tokenProgram",
+                    "isMut": false,
+                    "isSigner": false
+                },
+                {
+                    "name": "associatedTokenProgram",
+                    "isMut": false,
+                    "isSigner": false
+                },
+                {
+                    "name": "systemProgram",
+                    "isMut": false,
+                    "isSigner": false
+                }
+            ],
+            "args": [
+                {
+                    "name": "amount",
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "transferOwner",
+            "accounts": [
+                {
+                    "name": "stakePool",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "user",
+                    "isMut": true,
+                    "isSigner": true
+                },
+                {
+                    "name": "systemProgram",
+                    "isMut": false,
+                    "isSigner": false
+                }
+            ],
+            "args": [
+                {
+                    "name": "newOwner",
+                    "type": "publicKey"
+                }
+            ]
+        },
+        {
+            "name": "initEntry",
+            "accounts": [
+                {
+                    "name": "stakeEntry",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "stakePool",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "payer",
+                    "isMut": true,
+                    "isSigner": true
+                },
+                {
+                    "name": "systemProgram",
+                    "isMut": false,
+                    "isSigner": false
+                }
+            ],
+            "args": []
+        },
+        {
+            "name": "stakeTokens",
+            "accounts": [
+                {
+                    "name": "stakePool",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "poolTokenAccount",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "stakeEntry",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "stakeMint",
+                    "isMut": false,
+                    "isSigner": false
+                },
+                {
+                    "name": "user",
+                    "isMut": true,
+                    "isSigner": true
+                },
+                {
+                    "name": "userTokenAccount",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "escrowTokenAccount",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "tokenProgram",
+                    "isMut": false,
+                    "isSigner": false
+                },
+                {
+                    "name": "associatedTokenProgram",
+                    "isMut": false,
+                    "isSigner": false
+                },
+                {
+                    "name": "systemProgram",
+                    "isMut": false,
+                    "isSigner": false
+                }
+            ],
+            "args": [
+                {
+                    "name": "amount",
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "unstakeTokens",
+            "accounts": [
+                {
+                    "name": "stakePool",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "poolTokenAccount",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "stakeEntry",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "stakeMint",
+                    "isMut": false,
+                    "isSigner": false
+                },
+                {
+                    "name": "user",
+                    "isMut": true,
+                    "isSigner": true
+                },
+                {
+                    "name": "userTokenAccount",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "escrowTokenAccount",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "tokenProgram",
+                    "isMut": false,
+                    "isSigner": false
+                },
+                {
+                    "name": "associatedTokenProgram",
+                    "isMut": false,
+                    "isSigner": false
+                },
+                {
+                    "name": "systemProgram",
+                    "isMut": false,
+                    "isSigner": false
+                }
+            ],
+            "args": [
+                {
+                    "name": "amount",
+                    "type": "u64"
+                }
+            ]
+        },
+        {
+            "name": "claimTokens",
+            "accounts": [
+                {
+                    "name": "stakePool",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "poolTokenAccount",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "stakeEntry",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "stakeMint",
+                    "isMut": false,
+                    "isSigner": false
+                },
+                {
+                    "name": "user",
+                    "isMut": true,
+                    "isSigner": true
+                },
+                {
+                    "name": "userTokenAccount",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "escrowTokenAccount",
+                    "isMut": true,
+                    "isSigner": false
+                },
+                {
+                    "name": "tokenProgram",
+                    "isMut": false,
+                    "isSigner": false
+                },
+                {
+                    "name": "associatedTokenProgram",
+                    "isMut": false,
+                    "isSigner": false
+                },
+                {
+                    "name": "systemProgram",
+                    "isMut": false,
+                    "isSigner": false
+                }
+            ],
+            "args": []
+        }
+    ],
+    "accounts": [
+        {
+            "name": "StakeEntry",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "bump",
+                        "type": "u8"
+                    },
+                    {
+                        "name": "pool",
+                        "type": "publicKey"
+                    },
+                    {
+                        "name": "lastStaker",
+                        "type": "publicKey"
+                    },
+                    {
+                        "name": "lastStakedAt",
+                        "type": {
+                            "option": "i64"
+                        }
+                    },
+                    {
+                        "name": "amount",
+                        "type": "u64"
+                    },
+                    {
+                        "name": "rewards",
+                        "type": "u64"
+                    },
+                    {
+                        "name": "claimed",
+                        "type": "u64"
+                    }
+                ]
+            }
+        },
+        {
+            "name": "StakePool",
+            "type": {
+                "kind": "struct",
+                "fields": [
+                    {
+                        "name": "bump",
+                        "type": "u8"
+                    },
+                    {
+                        "name": "authority",
+                        "type": "publicKey"
+                    },
+                    {
+                        "name": "totalStaked",
+                        "type": "u64"
+                    },
+                    {
+                        "name": "totalStakers",
+                        "type": "u32"
+                    },
+                    {
+                        "name": "mint",
+                        "type": "publicKey"
+                    },
+                    {
+                        "name": "escrowFee",
+                        "type": "publicKey"
+                    },
+                    {
+                        "name": "apr",
+                        "type": "u64"
+                    }
+                ]
+            }
+        }
+    ],
+    "errors": [
+        {
+            "code": 6000,
+            "name": "InvalidStakePool",
+            "msg": "Invalid stake pool"
+        },
+        {
+            "code": 6001,
+            "name": "InvalidStakeEntry",
+            "msg": "Invalid stake entry"
+        },
+        {
+            "code": 6002,
+            "name": "InvalidAuthority",
+            "msg": "Invalid stake pool authority"
+        },
+        {
+            "code": 6003,
+            "name": "InvalidEscrow",
+            "msg": "Mismatched user and escrow"
+        },
+        {
+            "code": 6004,
+            "name": "InvalidStakeMint",
+            "msg": "Invalid stake mint"
+        },
+        {
+            "code": 6005,
+            "name": "TokensAlreadyStaked",
+            "msg": "Tokens Already Staked"
+        },
+        {
+            "code": 6006,
+            "name": "InvalidPaymentShare",
+            "msg": "Invalid payment share"
+        },
+        {
+            "code": 6007,
+            "name": "InvalidPaymentTokenAccount",
+            "msg": "Invalid payment token account"
+        },
+        {
+            "code": 6008,
+            "name": "InvalidPayerTokenAccount",
+            "msg": "Invalid payer token account"
+        },
+        {
+            "code": 6009,
+            "name": "InvalidUserStakeMintTokenAccount",
+            "msg": "Invalid User Stake Mint Token Account"
+        },
+        {
+            "code": 6010,
+            "name": "MinStakeSecondsNotSatisfied",
+            "msg": "Minimum stake seconds not satisfied"
+        },
+        {
+            "code": 6011,
+            "name": "InvalidUnstakeAmount",
+            "msg": "Invalid Unstake Amount"
+        },
+        {
+            "code": 6012,
+            "name": "NotEnoughRewards",
+            "msg": "Not Enough Rewards"
+        }
+    ],
+    "metadata": {
+        "address": "62FFaNtBxn1p77Mcn5wZ6cRFDYq5k4tdubZg67cagvQg"
+    }
+}
+   
