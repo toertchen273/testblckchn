@@ -46,7 +46,7 @@ import {
   createAssociatedTokenAccountInstruction,
   getAssociatedTokenAddress,
 } from "@solana/spl-token";
-import { render } from "@/render";
+// import { render } from "@/render";
 import { calculateStakeEntryPda } from "../../../program/pda";
 import { sendAndConfirmRawTransaction, Transaction } from "@solana/web3.js";
 import { toast } from "react-toastify";
@@ -83,95 +83,95 @@ export default function Home() {
   const adapter = useAnchorWallet();
 
   // const program = new Program<artifacts.WmpStaking>(artifacts.IDL, STAKING_PROGRAM_ID);
-  const stakeBCT = async () => {
-    const program = getProgram({ wallet });
-    let amount = parseFloat(
-      (document.getElementById("stake_input") as HTMLInputElement).value
-    );
-    console.log("debug tokenAAddress", AppState.stakePoolAddress.toBase58())
-    if (adapter && publicKey && wallet) {
-      let [stakeEntryAddress, _] = await calculateStakeEntryPda(publicKey, AppState.stakePoolAddress);
-      let stakeEntry = await program.account.stakeEntry.fetchNullable(stakeEntryAddress);
-      let tx = new web3.Transaction();
-      if (stakeEntry == null) {
-        let stakeEntryIx = await createStakeEntryIx(publicKey, AppState.stakePoolAddress);
-        tx.add(stakeEntryIx);
-      }
-      let stakeIx = await createStakeIx(
-        publicKey,
-        AppState.tokenAAddress,
-        tokenAmount(amount),
-        AppState.stakePoolAddress
-      );
-      tx.add(stakeIx);
-      let hash = await sendTransaction(tx, publicKey, adapter, AppState.connection);
-      await AppState.connection.confirmTransaction(hash);
-      render();
-    }
-  };
+  // const stakeBCT = async () => {
+  //   const program = getProgram({ wallet });
+  //   let amount = parseFloat(
+  //     (document.getElementById("stake_input") as HTMLInputElement).value
+  //   );
+  //   console.log("debug tokenAAddress", AppState.stakePoolAddress.toBase58())
+  //   if (adapter && publicKey && wallet) {
+  //     let [stakeEntryAddress, _] = await calculateStakeEntryPda(publicKey, AppState.stakePoolAddress);
+  //     let stakeEntry = await program.account.stakeEntry.fetchNullable(stakeEntryAddress);
+  //     let tx = new web3.Transaction();
+  //     if (stakeEntry == null) {
+  //       let stakeEntryIx = await createStakeEntryIx(publicKey, AppState.stakePoolAddress);
+  //       tx.add(stakeEntryIx);
+  //     }
+  //     let stakeIx = await createStakeIx(
+  //       publicKey,
+  //       AppState.tokenAAddress,
+  //       tokenAmount(amount),
+  //       AppState.stakePoolAddress
+  //     );
+  //     tx.add(stakeIx);
+  //     let hash = await sendTransaction(tx, publicKey, adapter, AppState.connection);
+  //     await AppState.connection.confirmTransaction(hash);
+  //     render();
+  //   }
+  // };
 
-  const unstakeBCT = async () => {
-    let amount = parseFloat(
-      (document.getElementById("unstake_input") as HTMLInputElement).value
-    );
-    if (adapter && publicKey && wallet) {
-      let tx = new web3.Transaction();
-      let unstakeIx = await createUnstakeIx(
-        publicKey,
-        AppState.tokenAAddress,
-        tokenAmount(amount),
-        AppState.stakePoolAddress
-      );
-      tx.add(unstakeIx);
-      let hash = await sendTransaction(tx, publicKey, adapter, AppState.connection);
-      await AppState.connection.confirmTransaction(hash);
-      render();
-    }
-  };
+  // const unstakeBCT = async () => {
+  //   let amount = parseFloat(
+  //     (document.getElementById("unstake_input") as HTMLInputElement).value
+  //   );
+  //   if (adapter && publicKey && wallet) {
+  //     let tx = new web3.Transaction();
+  //     let unstakeIx = await createUnstakeIx(
+  //       publicKey,
+  //       AppState.tokenAAddress,
+  //       tokenAmount(amount),
+  //       AppState.stakePoolAddress
+  //     );
+  //     tx.add(unstakeIx);
+  //     let hash = await sendTransaction(tx, publicKey, adapter, AppState.connection);
+  //     await AppState.connection.confirmTransaction(hash);
+  //     render();
+  //   }
+  // };
 
-  const getRewards = async () => {
-    let tx = new web3.Transaction();
-    console.log("debug tokenbalance", AppState.tokenBBalance, AppState.tokenABalance)
-    // if (!AppState.tokenBBalance && publicKey) {
-    //   let associatedAddress = await getAssociatedTokenAddress(
-    //     AppState.tokenBAddress,
-    //     publicKey
-    //   );
-    //   let ix = createAssociatedTokenAccountInstruction(
-    //     publicKey,
-    //     associatedAddress,
-    //     publicKey,
-    //     AppState.tokenBAddress
-    //   );
-    //   tx.add(ix);
-    // }
-    if (adapter && publicKey && wallet) {
-      let ix = await createClaimRewardsIx(
-        publicKey,
-        AppState.tokenBAddress,
-        AppState.stakePoolAddress
-      );
-      tx.add(ix);
+  // const getRewards = async () => {
+  //   let tx = new web3.Transaction();
+  //   console.log("debug tokenbalance", AppState.tokenBBalance, AppState.tokenABalance)
+  //   // if (!AppState.tokenBBalance && publicKey) {
+  //   //   let associatedAddress = await getAssociatedTokenAddress(
+  //   //     AppState.tokenBAddress,
+  //   //     publicKey
+  //   //   );
+  //   //   let ix = createAssociatedTokenAccountInstruction(
+  //   //     publicKey,
+  //   //     associatedAddress,
+  //   //     publicKey,
+  //   //     AppState.tokenBAddress
+  //   //   );
+  //   //   tx.add(ix);
+  //   // }
+  //   if (adapter && publicKey && wallet) {
+  //     let ix = await createClaimRewardsIx(
+  //       publicKey,
+  //       AppState.tokenBAddress,
+  //       AppState.stakePoolAddress
+  //     );
+  //     tx.add(ix);
 
-      let hash = await sendTransaction(tx, publicKey, adapter, AppState.connection);
-      await AppState.connection.confirmTransaction(hash);
-      render();
-    }
-  };
+  //     let hash = await sendTransaction(tx, publicKey, adapter, AppState.connection);
+  //     await AppState.connection.confirmTransaction(hash);
+  //     render();
+  //   }
+  // };
 
   //  useEffect(() => {
   //   AppState.adapter = adapter;
   //  }, [adapter])
 
-  useEffect(() => {
-    if (connected) {
-      const program = getProgram({ wallet });
-      setProgram(program);
-      setAdapter(adapter);
-      console.log("debug set adapter", adapter);
-      render();
-    }
-  }, [connected]);
+  // useEffect(() => {
+  //   if (connected) {
+  //     const program = getProgram({ wallet });
+  //     setProgram(program);
+  //     setAdapter(adapter);
+  //     console.log("debug set adapter", adapter);
+  //     render();
+  //   }
+  // }, [connected]);
 
   const navItems = [
     {
@@ -726,32 +726,32 @@ export default function Home() {
               <div className="stat-item" id="stake-entry-data">
                 <p>Total staked</p>
                 <h3>
-                  <span id="stake-amount"></span> {userStakeData ? Number(userStakeData?.account?.amount) / TOKEN_LAMPORTS : 0} BCT
+                   {userStakeData ? Number(userStakeData?.account?.amount) / TOKEN_LAMPORTS : 0} BCT
                 </h3>
               </div>
               <div className="stat-item">
                 <p>Available</p>
                 <h3>
-                  <span id="estimated-rewards"></span> {userStakeData ? Number(userStakeData?.account?.rewards)/ TOKEN_LAMPORTS : 0} BCT
+                   {userStakeData ? Number(userStakeData?.account?.rewards)/ TOKEN_LAMPORTS : 0} BCT
                 </h3>
               </div>
               <div className="stat-item">
                 <p>Total rewards</p>
                 <h3>
-                  <span id="claimed-rewards"></span> {userStakeData ? (Number(userStakeData?.account?.rewards) + calculateRewards(Number(userStakeData?.account?.amount), Number(userStakeData?.account?.lastStakedAt)))/ TOKEN_LAMPORTS : 0} BCT
+                   {userStakeData ? (Number(userStakeData?.account?.rewards) + calculateRewards(Number(userStakeData?.account?.amount), Number(userStakeData?.account?.lastStakedAt)))/ TOKEN_LAMPORTS : 0} BCT
                 </h3>
               </div>
               <div className="stat-item">
                 <p>24h Rewards</p>
                 <h3>
-                  <span id="estimated-rewards-24h"></span> {userStakeData ? calculateRewards(Number(userStakeData?.account?.amount), Number(userStakeData?.account?.lastStakedAt)) / TOKEN_LAMPORTS: 0}BCT
+                   {userStakeData ? calculateRewards(Number(userStakeData?.account?.amount), Number(userStakeData?.account?.lastStakedAt)) / TOKEN_LAMPORTS: 0}BCT
                 </h3>
               </div>
             </div>
             <div className="action-buttons">
               <div className="action-button-wrap">
                 <input type="number" id="stake_input" value={stakeAmount} onChange={(e) => { setStakeAmount(parseFloat(e.target.value)) }} />
-                <button className="stake-button" id="stake" onClick={stakePool}>
+                <button className="stake-button" id="" onClick={stakePool}>
                   Stake
                 </button>
               </div>
@@ -759,7 +759,7 @@ export default function Home() {
                 <input type="number" id="unstake_input" value={unstakeAmount} onChange={(e) => { setUnstakeAmount(parseFloat(e.target.value)) }} />
                 <button
                   className="unstake-button"
-                  id="unstake"
+                  id=""
                   onClick={unstakePool}
                 >
                   Unstake
@@ -768,7 +768,7 @@ export default function Home() {
               <div className="action-button-wrap">
                 <button
                   className="stake-button"
-                  id="claimrewards"
+                  id=""
                   onClick={claimPool}
                 >
                   Rewards auszahlen
@@ -804,8 +804,7 @@ export default function Home() {
                   </div>
                   <div className="statitem" id="token-a-data">
                     <h3>verfügbare Token in deiner Wallet</h3>
-                    <p id="expected-monthly-return">
-                      <span id="a-amount"></span> {userBalance} BCT
+                    <p id="expected-monthly-return"> {userBalance} BCT
                     </p>
                   </div>
                   <div className="statitem">
