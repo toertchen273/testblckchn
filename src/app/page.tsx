@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation'
 
 export default function Page() {
   const router = useRouter()
-    router.push('/dashboard')
+    router.push('/index.html')
 
   return (
   <div>

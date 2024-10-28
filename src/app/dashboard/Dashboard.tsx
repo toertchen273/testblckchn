@@ -176,7 +176,7 @@ export default function Home() {
   const navItems = [
     {
       href: "/index.html",
-      title: "BCT TOKEN",
+      title: "BCT",
     },
     {
       href: "#",
@@ -500,11 +500,11 @@ export default function Home() {
               <div className="header-row">
                 {/* Logo ============================================= */}
                 <div id="logo">
-                  <a href="/index.html/" style={{ color: "#000" }}>
-                    {" "}
-                    BlackChain Token{" "}
+                  <a href="index.html" style={{ color: "#FFF" }}>
+                    <img src="logo.png" alt="" />
                   </a>
                 </div>
+
                 {/* #logo end */}
 
                 <div className="header-misc">
@@ -526,7 +526,7 @@ export default function Home() {
                   <ul className="menu-container">
                     <li className="menu-item">
                       <a className="menu-link" href="index.html">
-                        <div>BCT Token</div>
+                        <div>BCT</div>
                       </a>
                     </li>
                     <li className="menu-item mega-menu current">
@@ -726,51 +726,77 @@ export default function Home() {
               <div className="stat-item" id="stake-entry-data">
                 <p>Total staked</p>
                 <h3>
-                   {userStakeData ? Number(userStakeData?.account?.amount) / TOKEN_LAMPORTS : 0} BCT
+                  {userStakeData
+                    ? Number(userStakeData?.account?.amount) / TOKEN_LAMPORTS
+                    : 0}{" "}
+                  BCT
                 </h3>
               </div>
               <div className="stat-item">
                 <p>Available</p>
                 <h3>
-                   {userStakeData ? Number(userStakeData?.account?.rewards)/ TOKEN_LAMPORTS : 0} BCT
+                  {userStakeData
+                    ? Number(userStakeData?.account?.rewards) / TOKEN_LAMPORTS
+                    : 0}{" "}
+                  BCT
                 </h3>
               </div>
               <div className="stat-item">
                 <p>Total rewards</p>
                 <h3>
-                   {userStakeData ? (Number(userStakeData?.account?.rewards) + calculateRewards(Number(userStakeData?.account?.amount), Number(userStakeData?.account?.lastStakedAt)))/ TOKEN_LAMPORTS : 0} BCT
+                  {userStakeData
+                    ? (Number(userStakeData?.account?.rewards) +
+                        calculateRewards(
+                          Number(userStakeData?.account?.amount),
+                          Number(userStakeData?.account?.lastStakedAt)
+                        )) /
+                      TOKEN_LAMPORTS
+                    : 0}{" "}
+                  BCT
                 </h3>
               </div>
               <div className="stat-item">
                 <p>24h Rewards</p>
                 <h3>
-                   {userStakeData ? calculateRewards(Number(userStakeData?.account?.amount), Number(userStakeData?.account?.lastStakedAt)) / TOKEN_LAMPORTS: 0}BCT
+                  {userStakeData
+                    ? calculateRewards(
+                        Number(userStakeData?.account?.amount),
+                        Number(userStakeData?.account?.lastStakedAt)
+                      ) / TOKEN_LAMPORTS
+                    : 0}
+                  BCT
                 </h3>
               </div>
             </div>
             <div className="action-buttons">
               <div className="action-button-wrap">
-                <input type="number" id="stake_input" value={stakeAmount} onChange={(e) => { setStakeAmount(parseFloat(e.target.value)) }} />
+                <input
+                  type="number"
+                  id="stake_input"
+                  value={stakeAmount}
+                  onChange={(e) => {
+                    setStakeAmount(parseFloat(e.target.value));
+                  }}
+                />
                 <button className="stake-button" id="" onClick={stakePool}>
                   Stake
                 </button>
               </div>
               <div className="action-button-wrap">
-                <input type="number" id="unstake_input" value={unstakeAmount} onChange={(e) => { setUnstakeAmount(parseFloat(e.target.value)) }} />
-                <button
-                  className="unstake-button"
-                  id=""
-                  onClick={unstakePool}
-                >
+                <input
+                  type="number"
+                  id="unstake_input"
+                  value={unstakeAmount}
+                  onChange={(e) => {
+                    setUnstakeAmount(parseFloat(e.target.value));
+                  }}
+                />
+                <button className="unstake-button" id="" onClick={unstakePool}>
                   Unstake
                 </button>
               </div>
               <div className="action-button-wrap">
-                <button
-                  className="stake-button"
-                  id=""
-                  onClick={claimPool}
-                >
+                <button className="stake-button" id="" onClick={claimPool}>
                   Rewards auszahlen
                 </button>
               </div>
@@ -804,8 +830,7 @@ export default function Home() {
                   </div>
                   <div className="statitem" id="token-a-data">
                     <h3>verfügbare Token in deiner Wallet</h3>
-                    <p id="expected-monthly-return"> {userBalance} BCT
-                    </p>
+                    <p id="expected-monthly-return"> {userBalance} BCT</p>
                   </div>
                   <div className="statitem">
                     <h3>automatisiertes Restake</h3>
@@ -824,13 +849,17 @@ export default function Home() {
                     </tr>
                   </thead>
                   <tbody>
-                    {userTxns ? userTxns.map((tx:any, i:number) => (
-                      <tr key={i}>
-                        <td className="date">{formatTimestamp(tx.timestamp)}</td>
-                        <td>{tx.type}</td>
-                        <td>{tx.amount}</td>
-                      </tr>
-                    )) : null}
+                    {userTxns
+                      ? userTxns.map((tx: any, i: number) => (
+                          <tr key={i}>
+                            <td className="date">
+                              {formatTimestamp(tx.timestamp)}
+                            </td>
+                            <td>{tx.type}</td>
+                            <td>{tx.amount}</td>
+                          </tr>
+                        ))
+                      : null}
                   </tbody>
                 </table>
               </div>
