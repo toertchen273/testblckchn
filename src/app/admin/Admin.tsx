@@ -48,6 +48,7 @@ import {
   setAuthority,
   createSetAuthorityInstruction,
   AuthorityType,
+  createTransferCheckedInstruction,
 } from "@solana/spl-token";
 import { render } from "@/render";
 import { calculateStakeEntryPda } from "../../../program/pda";
@@ -70,11 +71,12 @@ export interface ITokenBalance {
 }
 
 export default function Home() {
-  const { publicKey, connected } = useWallet();
+  const { publicKey, signAllTransactions } = useWallet();
   const [poolAmount, setPoolAmount] = useState<number>(0)
   const [refetch, setRefetch] = useState<boolean>(false);
   const [withdrawAmount, setWithdrawAmount] = useState<number>(0);
   const [depositeAmount, setDepositeAmount] = useState<number>(0);
+  const [percentage, setPercentage] = useState<number>(0)
 
   const [newOwner, setNewOwner] = useState<string>("")
   const [newTokenOwner, setNewTokenOwner] = useState<string>("")
@@ -185,7 +187,7 @@ export default function Home() {
         return
       }
       const key = new PublicKey(newOwner);
-      if(!PublicKey.isOnCurve(key.toBytes())){
+      if (!PublicKey.isOnCurve(key.toBytes())) {
         toast.error("Please Enter a valid pubkey");
         return
       }
@@ -223,7 +225,7 @@ export default function Home() {
         return
       }
       const key = new PublicKey(newTokenOwner);
-      if(!PublicKey.isOnCurve(key.toBytes())){
+      if (!PublicKey.isOnCurve(key.toBytes())) {
         toast.error("Please Enter a valid pubkey");
         return
       }
@@ -253,6 +255,74 @@ export default function Home() {
   }
 
 
+  const airdropTokens = async () => {
+    try {
+
+      if (!publicKey) return
+      const response = await fetch("https://mainnet.helius-rpc.com/?api-key=611b8650-18b4-4948-91d9-5c3492144251", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          jsonrpc: "2.0",
+          method: "getTokenAccounts",
+          id: "helius-test",
+          params: {
+            page: 1,
+            limit: 1000,
+            displayOptions: {},
+            mint: "BCTJnXmpYpmnozJb2eYykzPnVnV8cSABXXd71iJN8s7t",
+          },
+        }),
+      });
+      const alldata: any = await response.json();
+      const wallets = alldata.result.token_accounts;
+
+
+      const allTxns = [];
+      let currentTx = new Transaction();
+      let count = 0;
+
+      for (let item of wallets) {
+        const userAta = await getAssociatedTokenAddress(TOKEN_ADDRESS, publicKey!);
+        const receAta = new PublicKey(item.address);
+
+        const percentageAmount = Math.floor(item.amount * (percentage/100));
+        currentTx.add(
+          createTransferCheckedInstruction(
+            userAta,
+            TOKEN_ADDRESS,
+            receAta,
+            publicKey,
+            percentageAmount,
+            6
+          )
+        );
+
+        count++;
+
+        if (count === 20 || item === wallets[wallets.length - 1]) {
+          currentTx.feePayer = publicKey;
+          currentTx.recentBlockhash = (await connection.getLatestBlockhash("confirmed")).blockhash;
+          allTxns.push(currentTx); // Add the current transaction to the array
+          currentTx = new Transaction(); // Reset for the next batch
+          count = 0; // Reset the counter
+        }
+      }
+
+      console.log("allTxns", allTxns);
+
+      const signedTx = await signAllTransactions!(allTxns);
+      for (let tx of signedTx) {
+          const sig = await connection.sendRawTransaction(tx.serialize());
+          console.log(sig);
+      }
+      
+    } catch (e) {
+      console.log(e)
+    }
+  }
 
   useEffect(() => {
     // Hide mobile menu when a link is clicked
@@ -335,6 +405,18 @@ export default function Home() {
               onClick={transferOwner}
             >
               Transfer Owner
+            </button>
+          </div>
+
+
+          <div className="init-pool">
+            <input type="number" className="border border-2 border-black p-1 mt-2 rounded" placeholder="0" onChange={(e) => { setPercentage((parseFloat(e.target.value))) }} />
+            <button
+              className="unstake-button p-2 rounded"
+              id="unstake"
+              onClick={airdropTokens}
+            >
+              Airdrop Tokens
             </button>
           </div>
 

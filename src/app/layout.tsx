@@ -5,10 +5,9 @@ import "./globals.css";
 const inter = Inter({ subsets: ["latin"] });
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { Wallet } from "./Wallet";
 
 export const metadata: Metadata = {
-  title: "BlackRock Token",
+  title: "BlackChain Token",
   description: "",
 };
 
@@ -19,10 +18,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <Wallet>
-      <ToastContainer/>
-      </Wallet>
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+      {/* <ToastContainer/> */}
+        {children}
+        </body>
     </html>
   );
 }

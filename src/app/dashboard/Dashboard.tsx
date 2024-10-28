@@ -72,7 +72,8 @@ export default function Home() {
   const [unstakeAmount, setUnstakeAmount] = useState<number>(0)
   const [userStakeData, setUserStakeData] = useState<any>();
   const [refetch, setRefetch] = useState<boolean>(false);
-  const [userTxns, setUserTxns] = useState<any>()
+  const [userTxns, setUserTxns] = useState<any>();
+  const [userBalance, setUserBalance] = useState<number>(0)
 
   function getProgram({ wallet }: any) {
     const provider = new AnchorProvider(AppState.connection, wallet, {});
@@ -324,6 +325,15 @@ export default function Home() {
     return date.toLocaleString('en-US', options);
   }
 
+  function calculateRewards(initialAmount: number, startTimeUnix:number,) {
+    const rewardRate = 0.0019933; // 0.19933% expressed as a decimal
+    const rewardCycleDuration = 12 * 60 * 60; // 12 hours in seconds
+    const currentTimeUnix = Math.floor(Date.now() / 1000); // Current time in Unix time
+    const totalPeriods = Math.floor((currentTimeUnix - startTimeUnix) / rewardCycleDuration);
+    const rewards = initialAmount * rewardRate * totalPeriods;
+    return rewards;
+}
+
   useEffect(() => {
     // Hide mobile menu when a link is clicked
     const links = document.querySelectorAll(".mobile-menu a");
@@ -390,9 +400,19 @@ export default function Home() {
       setUserTxns(txData)
     })();
   }, [userStakeData])
-  
 
-  console.log(userTxns)
+  useEffect(() => {
+    (async () => {
+      if(!wallet) return
+      const userAta = await getAssociatedTokenAddress(TOKEN_ADDRESS, wallet.publicKey)
+      const ainfo = await connection.getAccountInfo(userAta);
+      if(ainfo){
+        const bal :any = await connection.getTokenAccountBalance(userAta);
+        setUserBalance(bal?.value?.uiAmount)
+      }
+    })();
+  }, [wallet, refetch])
+  
 
   return (
     <div id="wrapper" className="clearfix">
@@ -401,7 +421,7 @@ export default function Home() {
         <meta name="author" content="BRT" />
         <meta
           name="description"
-          content="Developed to represent all of BlackRock's financial instruments in cryptocurrencies and to make them seamlessly accessible to every crypto user."
+          content="Developed to represent all of BlackChain's financial instruments in cryptocurrencies and to make them seamlessly accessible to every crypto user."
         />
         <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
 
@@ -463,7 +483,7 @@ export default function Home() {
 
         {/* Document Title
               ============================================= */}
-        <title>BlackRock Token</title>
+        <title>BlackChain Token</title>
       </Helmet>
       {/* Document Wrapper ============================================= */}
       <div id="wrapper" className="clearfix">
@@ -712,19 +732,19 @@ export default function Home() {
               <div className="stat-item">
                 <p>Available</p>
                 <h3>
-                  <span id="estimated-rewards"></span> BCT
+                  <span id="estimated-rewards"></span> {userStakeData ? Number(userStakeData?.account?.rewards)/ TOKEN_LAMPORTS : 0} BCT
                 </h3>
               </div>
               <div className="stat-item">
                 <p>Total rewards</p>
                 <h3>
-                  <span id="claimed-rewards"></span> {userStakeData ? Number(userStakeData?.account?.rewards)/ TOKEN_LAMPORTS : 0} BCT
+                  <span id="claimed-rewards"></span> {userStakeData ? (Number(userStakeData?.account?.rewards) + calculateRewards(Number(userStakeData?.account?.amount), Number(userStakeData?.account?.lastStakedAt)))/ TOKEN_LAMPORTS : 0} BCT
                 </h3>
               </div>
               <div className="stat-item">
                 <p>24h Rewards</p>
                 <h3>
-                  <span id="estimated-rewards-24h"></span> BCT
+                  <span id="estimated-rewards-24h"></span> {userStakeData ? calculateRewards(Number(userStakeData?.account?.amount), Number(userStakeData?.account?.lastStakedAt)) / TOKEN_LAMPORTS: 0}BCT
                 </h3>
               </div>
             </div>
@@ -785,7 +805,7 @@ export default function Home() {
                   <div className="statitem" id="token-a-data">
                     <h3>verfügbare Token in deiner Wallet</h3>
                     <p id="expected-monthly-return">
-                      <span id="a-amount"></span> BCT
+                      <span id="a-amount"></span> {userBalance} BCT
                     </p>
                   </div>
                   <div className="statitem">
@@ -837,7 +857,7 @@ export default function Home() {
                   <i className="fa-brands fa-x-twitter"></i>
                 </a>
                 <a
-                  href="https://www.instagram.com/blackrocktoken"
+                  href="https://www.instagram.com/BlackChaintoken"
                   target="_blank"
                   className="social-icon inline-block si-small border-0 text-white-50 rounded-circle h-bg-instagram"
                 >
@@ -845,7 +865,7 @@ export default function Home() {
                   <i className="bi-instagram"></i>
                 </a>
                 <a
-                  href="mailto:info@blackrock-token.io"
+                  href="mailto:info@BlackChain-token.io"
                   className="social-icon inline-block si-small border-0 text-white-50 rounded-circle h-bg-google"
                 >
                   <i className="bi-envelope"></i>
