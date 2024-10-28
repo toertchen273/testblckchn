@@ -41,6 +41,6 @@ export let AppState = {
     tokenAAddress: new web3.PublicKey("AdaEUjSPakTbCMDZeyBw76qBrod8YGUad3t4dVmkmGHz"),
     tokenBAddress: new web3.PublicKey("AdaEUjSPakTbCMDZeyBw76qBrod8YGUad3t4dVmkmGHz"),
     stakePoolAddress: new web3.PublicKey("BFCbiFLZUCWESpgdZf9zmsgzhaWSCbdWVJtDRYvnWo4T"),
-    connection: new web3.Connection("https://rpc.shyft.to?api_key=6qgEDmJbmOqBsbXq"),
-    // connection: new web3.Connection("https://mainnet.helius-rpc.com/?api-key=2d5226a1-a06a-4b96-a766-2ab2c0fcd68d")
+    // connection: new web3.Connection("https://rpc.shyft.to?api_key=6qgEDmJbmOqBsbXq"),
+    connection: new web3.Connection("https://divine-nameless-snow.solana-mainnet.quiknode.pro/cbf3ffcb19633575cc0d278031b1c28c7e538633")
 } as IAppState;
