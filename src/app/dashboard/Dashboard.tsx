@@ -746,10 +746,7 @@ export default function Home() {
                 <h3>
                   {userStakeData
                     ? (Number(userStakeData?.account?.rewards) +
-                        calculateRewards(
-                          Number(userStakeData?.account?.amount),
-                          Number(userStakeData?.account?.lastStakedAt)
-                        )) /
+                        Number(userStakeData?.account?.claimed)) /
                       TOKEN_LAMPORTS
                     : 0}{" "}
                   BCT
