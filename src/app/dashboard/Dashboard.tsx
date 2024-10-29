@@ -297,7 +297,7 @@ export default function Home() {
         const txId = await sendAndConfirmRawTransaction(connection, signedTx.serialize())
         toast.success("Tokens Claimed")
         console.log('signature', txId)
-        // setRefetch(!refetch)
+        setRefetch(!refetch)
       }
     } catch (e: any) {
       console.log(e)
@@ -307,9 +307,17 @@ export default function Home() {
   }
 
   function formatDecimal(value: number) {
-    let roundedValue = value.toFixed(3);
-    return parseFloat(roundedValue);
-  }
+    const stringValue = value.toString();
+    const dotIndex = stringValue.indexOf('.');
+    
+    if (dotIndex === -1) {
+        return parseFloat(stringValue); 
+    }
+    const integerPart = stringValue.slice(0, dotIndex);
+    const decimalPart = stringValue.slice(dotIndex + 1, dotIndex + 4);
+    const formattedValue = decimalPart.length > 0 ? `${integerPart}.${decimalPart}` : integerPart;
+    return parseFloat(formattedValue);
+}
 
   function formatTimestamp(timestamp: number) {
     // Create a new Date object from the timestamp
@@ -747,10 +755,10 @@ export default function Home() {
                 <p>Available</p>
                 <h3>
                   {userStakeData
-                    ? formatDecimal(calculateRewards(
+                    ? formatDecimal((calculateRewards(
                       Number(userStakeData?.account?.amount),
                       Number(userStakeData?.account?.lastStakedAt)
-                    ) / TOKEN_LAMPORTS)
+                    ) + Number(userStakeData?.account?.rewards ))/ TOKEN_LAMPORTS)
                     : 0}{" "}
                   BCT
                 </h3>
@@ -764,7 +772,8 @@ export default function Home() {
                         Number(userStakeData?.account?.amount),
                         Number(userStakeData?.account?.lastStakedAt)
                       ) +
-                      Number(userStakeData?.account?.claimed)) /
+                      Number(userStakeData?.account?.claimed)
+                      + Number(userStakeData?.account?.rewards )) /
                       TOKEN_LAMPORTS)
                     : 0}{" "}
                   BCT
