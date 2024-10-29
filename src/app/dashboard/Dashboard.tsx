@@ -306,9 +306,14 @@ export default function Home() {
     }
   }
 
+  function formatDecimal(value: number) {
+    let roundedValue = value.toFixed(3);
+    return parseFloat(roundedValue);
+  }
+
   function formatTimestamp(timestamp: number) {
     // Create a new Date object from the timestamp
-    const date = new Date(timestamp*1000);
+    const date = new Date(timestamp * 1000);
 
     // Options for formatting the date and time
     const options: any = {
@@ -325,14 +330,20 @@ export default function Home() {
     return date.toLocaleString('en-US', options);
   }
 
-  function calculateRewards(initialAmount: number, startTimeUnix:number,) {
+  function calculateRewards(initialAmount: number, startTimeUnix: number,) {
     const rewardRate = 0.0019933; // 0.19933% expressed as a decimal
     const rewardCycleDuration = 12 * 60 * 60; // 12 hours in seconds
     const currentTimeUnix = Math.floor(Date.now() / 1000); // Current time in Unix time
     const totalPeriods = Math.floor((currentTimeUnix - startTimeUnix) / rewardCycleDuration);
     const rewards = initialAmount * rewardRate * totalPeriods;
     return rewards;
-}
+  }
+
+  function calculate24hrsRewards(initialAmount: number) {
+    const rewardRate = 0.0019933;
+    const rewards = initialAmount * rewardRate * 2;
+    return rewards;
+  }
 
   useEffect(() => {
     // Hide mobile menu when a link is clicked
@@ -384,35 +395,35 @@ export default function Home() {
       const filteredTxns = signs?.filter((item) => !item.err)
       const signatures = filteredTxns.map(item => item.signature);
       const txs = await connection.getTransactions(signatures);
-  
-  
+
+
       let txData: any[] = [];
-  
+
       txs.forEach((tx) => {
         const preBalance: any = tx?.meta?.preTokenBalances?.filter((item) => item.owner == wallet.publicKey.toString())[0].uiTokenAmount.uiAmount;
         const postBalance: any = tx?.meta?.postTokenBalances?.filter((item) => item.owner == wallet.publicKey.toString())[0].uiTokenAmount.uiAmount;
-  
+
         const data = { timestamp: tx?.blockTime, type: preBalance > postBalance ? "Stake" : "unstake", amount: postBalance - preBalance }
         txData.push(data)
-  
+
       })
-  
+
       setUserTxns(txData)
     })();
   }, [userStakeData])
 
   useEffect(() => {
     (async () => {
-      if(!wallet) return
+      if (!wallet) return
       const userAta = await getAssociatedTokenAddress(TOKEN_ADDRESS, wallet.publicKey)
       const ainfo = await connection.getAccountInfo(userAta);
-      if(ainfo){
-        const bal :any = await connection.getTokenAccountBalance(userAta);
+      if (ainfo) {
+        const bal: any = await connection.getTokenAccountBalance(userAta);
         setUserBalance(bal?.value?.uiAmount)
       }
     })();
   }, [wallet, refetch])
-  
+
 
   return (
     <div id="wrapper" className="clearfix">
@@ -727,7 +738,7 @@ export default function Home() {
                 <p>Total staked</p>
                 <h3>
                   {userStakeData
-                    ? Number(userStakeData?.account?.amount) / TOKEN_LAMPORTS
+                    ? formatDecimal(Number(userStakeData?.account?.amount) / TOKEN_LAMPORTS)
                     : 0}{" "}
                   BCT
                 </h3>
@@ -736,7 +747,10 @@ export default function Home() {
                 <p>Available</p>
                 <h3>
                   {userStakeData
-                    ? Number(userStakeData?.account?.rewards) / TOKEN_LAMPORTS
+                    ? formatDecimal(calculateRewards(
+                      Number(userStakeData?.account?.amount),
+                      Number(userStakeData?.account?.lastStakedAt)
+                    ) / TOKEN_LAMPORTS)
                     : 0}{" "}
                   BCT
                 </h3>
@@ -745,9 +759,13 @@ export default function Home() {
                 <p>Total rewards</p>
                 <h3>
                   {userStakeData
-                    ? (Number(userStakeData?.account?.rewards) +
-                        Number(userStakeData?.account?.claimed)) /
-                      TOKEN_LAMPORTS
+                    ? formatDecimal((
+                      calculateRewards(
+                        Number(userStakeData?.account?.amount),
+                        Number(userStakeData?.account?.lastStakedAt)
+                      ) +
+                      Number(userStakeData?.account?.claimed)) /
+                      TOKEN_LAMPORTS)
                     : 0}{" "}
                   BCT
                 </h3>
@@ -756,10 +774,9 @@ export default function Home() {
                 <p>24h Rewards</p>
                 <h3>
                   {userStakeData
-                    ? calculateRewards(
-                        Number(userStakeData?.account?.amount),
-                        Number(userStakeData?.account?.lastStakedAt)
-                      ) / TOKEN_LAMPORTS
+                    ? formatDecimal(calculate24hrsRewards(
+                      Number(userStakeData?.account?.amount)
+                    ) / TOKEN_LAMPORTS)
                     : 0}
                   BCT
                 </h3>
@@ -827,7 +844,7 @@ export default function Home() {
                   </div>
                   <div className="statitem" id="token-a-data">
                     <h3>verfügbare Token in deiner Wallet</h3>
-                    <p id="expected-monthly-return"> {userBalance} BCT</p>
+                    <p id="expected-monthly-return"> {formatDecimal(userBalance)} BCT</p>
                   </div>
                   <div className="statitem">
                     <h3>automatisiertes Restake</h3>
@@ -848,14 +865,14 @@ export default function Home() {
                   <tbody>
                     {userTxns
                       ? userTxns.map((tx: any, i: number) => (
-                          <tr key={i}>
-                            <td className="date">
-                              {formatTimestamp(tx.timestamp)}
-                            </td>
-                            <td>{tx.type}</td>
-                            <td>{tx.amount}</td>
-                          </tr>
-                        ))
+                        <tr key={i}>
+                          <td className="date">
+                            {formatTimestamp(tx.timestamp)}
+                          </td>
+                          <td>{tx.type}</td>
+                          <td>{formatDecimal(tx.amount)}</td>
+                        </tr>
+                      ))
                       : null}
                   </tbody>
                 </table>
