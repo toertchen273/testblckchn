@@ -68,8 +68,12 @@
   font-size: 12px;
 }
 
+.wallet-adapter-button {
+  background-color: #E73248
+  }
+
 .stake-button {
-  background-color: #788fc1;
+  background-color: #E73248;
   transition: 200ms ease-in-out;
 }
 
@@ -79,7 +83,18 @@
 
 .unstake-button {
   margin-right: 15vw;
-  background-color: #788fc1;
+  background-color: #E73248;
+  transition: 200ms ease-in-out;
+}
+
+.unstake-button:hover {
+  margin-right: 15vw;
+  background-color: #212529;
+  transition: 200ms ease-in-out;
+}
+.stake-button:hover {
+  margin-right: 15vw;
+  background-color: #212529;
   transition: 200ms ease-in-out;
 }
 
