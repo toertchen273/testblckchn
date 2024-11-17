@@ -68,20 +68,35 @@
   font-size: 12px;
 }
 
+.wallet-adapter-button {
+  background-color: #E73248
+  }
+
 .stake-button {
-  background-color: #788fc1;
+  background-color: #E73248;
   transition: 200ms ease-in-out;
 }
 
-.stake-button:hover {
+/* .stake-button:hover {
   box-shadow: 0 0.1px 1px rgba(0, 0, 0, 1);
-}
+} */
 
 .unstake-button {
   margin-right: 15vw;
-  background-color: #788fc1;
+  background-color: #E73248;
   transition: 200ms ease-in-out;
 }
+
+/* .unstake-button:hover {
+  margin-right: 15vw;
+  background-color: #212529;
+  transition: 200ms ease-in-out;
+} */
+/* .stake-button:hover {
+  margin-right: 15vw;
+  background-color: #212529;
+  transition: 200ms ease-in-out;
+} */
 
 .claim-rewards-button {
   background-color: #ff9800;
@@ -338,4 +353,160 @@
 
 .mobile-menu ul a:hover {
   color: #e63134;
+}
+
+.action-button-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+/* Input styling */
+.action-button-wrap input {
+  width: 100%;
+  padding-right: 60px; /* Add space for the "Max" button */
+  font-size: 16px;
+}
+
+/* Styling for the Max button */
+.action-button-wrap .max-button {
+  position: absolute;
+  right: 10px; /* Positions the button to the right inside the input */
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 14px;
+  color: #007bff;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+/* Mobile-specific adjustments */
+@media screen and (max-width: 380px){
+  .action-button-wrap input {
+    font-size: 16px;
+  }
+
+  .action-button-wrap .max-button {
+    font-size: 14px;
+    right: 8px; /* Adjust for smaller screens if needed */
+    padding-left: 300px;
+    padding-bottom: 28px;
+  }
+}
+
+@media screen and (min-width: 381px) and (max-width: 400px) {
+  .action-button-wrap input {
+    font-size: 16px;
+  }
+
+  .action-button-wrap .max-button {
+    font-size: 14px;
+    right: 8px; /* Adjust for smaller screens if needed */
+    padding-left: 325px;
+    padding-bottom: 28px;
+  }
+}
+
+@media screen and (min-width: 401px) and (max-width: 415px) {
+  .action-button-wrap input {
+    font-size: 16px;
+  }
+
+  .action-button-wrap .max-button {
+    font-size: 14px;
+    right: 8px; /* Adjust for smaller screens if needed */
+    padding-left: 330px;
+    padding-bottom: 28px;
+  }
+}
+@media screen and (min-width: 416px) and (max-width: 450px) {
+  .action-button-wrap input {
+    font-size: 16px;
+  }
+
+  .action-button-wrap .max-button {
+    font-size: 14px;
+    right: 8px; /* Adjust for smaller screens if needed */
+    padding-left: 350px;
+    padding-bottom: 28px;
+  }
+}
+
+@media screen and (min-width: 451px) and (max-width: 475px) {
+  .action-button-wrap input {
+    font-size: 16px;
+  }
+
+  .action-button-wrap .max-button {
+    font-size: 14px;
+    right: 8px; /* Adjust for smaller screens if needed */
+    padding-left: 377px;
+    padding-bottom: 28px;
+  }
+}
+
+@media screen and (min-width: 476px) and (max-width: 500px) {
+  .action-button-wrap input {
+    font-size: 16px;
+  }
+
+  .action-button-wrap .max-button {
+    font-size: 14px;
+    right: 8px; /* Adjust for smaller screens if needed */
+    padding-left: 400px;
+    padding-bottom: 28px;
+  }
+}
+
+@media screen and (min-width: 501px) and (max-width: 520px) {
+  .action-button-wrap input {
+    font-size: 16px;
+  }
+
+  .action-button-wrap .max-button {
+    font-size: 14px;
+    right: 8px; /* Adjust for smaller screens if needed */
+    padding-left: 420px;
+    padding-bottom: 28px;
+  }
+}
+@media screen and (min-width: 521px) and (max-width: 550px) {
+  .action-button-wrap input {
+    font-size: 16px;
+  }
+
+  .action-button-wrap .max-button {
+    font-size: 14px;
+    right: 8px; /* Adjust for smaller screens if needed */
+    padding-left: 440px;
+    padding-bottom: 28px;
+  }
+}
+
+@media screen and (min-width: 551px) and (max-width: 580px) {
+  .action-button-wrap input {
+    font-size: 16px;
+  }
+
+  .action-button-wrap .max-button {
+    font-size: 14px;
+    right: 8px; /* Adjust for smaller screens if needed */
+    padding-left: 465px;
+    padding-bottom: 28px;
+  }
+}
+
+@media screen and (min-width: 581px) and (max-width: 600px) {
+  .action-button-wrap input {
+    font-size: 16px;
+  }
+
+  .action-button-wrap .max-button {
+    font-size: 14px;
+    right: 8px; /* Adjust for smaller screens if needed */
+    padding-left: 490px;
+    padding-bottom: 28px;
+  }
 }

@@ -792,34 +792,69 @@ export default function Home() {
               </div>
             </div>
             <div className="action-buttons">
+              <div className="action-button-wrap" style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+  <input
+    type="number"
+    id="stake_input"
+    value={stakeAmount}
+    onChange={(e) => {
+      setStakeAmount(parseFloat(e.target.value));
+    }}
+    min = "0"
+    style={{ paddingRight: '50px' }} // Adjust padding to accommodate the placeholder
+  />
+  <button
+    className="max-button"
+    style={{
+      position: 'absolute',
+      right: '1px', // Positioning inside the input field
+      top: '55%',
+      transform: 'translateY(-50%)',
+      border: 'none',
+      background: 'none',
+      color: '#007bff', // Change to your preferred color
+      cursor: 'pointer',
+      outline: 'none'
+    }}
+    onClick={() => setStakeAmount(formatDecimal(userBalance))}
+  >
+    Max
+  </button>
+  
+</div>
+<button className="stake-button" style={{ margin: '3px' }} onClick={stakePool}>Stake</button>
+<div className="action-button-wrap" style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+  <input
+    type="number"
+    id="unstake_input"
+    value={unstakeAmount}
+    onChange={(e) => {
+      setUnstakeAmount(parseFloat(e.target.value));
+    }}
+    min = "0"
+    style={{ paddingRight: '50px' }} // Adjust padding to accommodate the placeholder
+  />
+  <button
+    className="max-button"
+    style={{
+      position: 'absolute',
+      right: '1px', // Positioning inside the input field
+      top: '55%',
+      transform: 'translateY(-50%)',
+      border: 'none',
+      background: 'none',
+      color: '#007bff', // Change to your preferred color
+      cursor: 'pointer',
+      outline: 'none'
+    }}
+    onClick={() => setUnstakeAmount(userStakeData ? Number(userStakeData.account.amount) / TOKEN_LAMPORTS : 0)}
+  >
+    Max
+  </button>
+</div>
+<button className="unstake-button" style={{ margin: '3px' }} onClick={unstakePool}>Unstake</button>
               <div className="action-button-wrap">
-                <input
-                  type="number"
-                  id="stake_input"
-                  value={stakeAmount}
-                  onChange={(e) => {
-                    setStakeAmount(parseFloat(e.target.value));
-                  }}
-                />
-                <button className="stake-button" id="" onClick={stakePool}>
-                  Stake
-                </button>
-              </div>
-              <div className="action-button-wrap">
-                <input
-                  type="number"
-                  id="unstake_input"
-                  value={unstakeAmount}
-                  onChange={(e) => {
-                    setUnstakeAmount(parseFloat(e.target.value));
-                  }}
-                />
-                <button className="unstake-button" id="" onClick={unstakePool}>
-                  Unstake
-                </button>
-              </div>
-              <div className="action-button-wrap">
-                <button className="stake-button" id="" onClick={claimPool}>
+                <button className="stake-button" id="" style={{ margin: '3px' }} onClick={claimPool}>
                   Rewards auszahlen
                 </button>
               </div>
