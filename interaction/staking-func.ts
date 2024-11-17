@@ -5,9 +5,10 @@ import idl from './idl.json'
 import { connection } from "./environment"
 import { AnchorWallet } from "@solana/wallet-adapter-react";
 import { ASSOCIATED_TOKEN_PROGRAM_ID, TOKEN_2022_PROGRAM_ID, TOKEN_PROGRAM_ID, getAssociatedTokenAddress, getMint } from "@solana/spl-token";
+import { BN } from "bn.js";
 
 // replace the newly created pool address here when new pool is created
-const POOL_ADDR = new PublicKey("F2xPo2zDtw1cGNL6X5G46U5yRQrqwLw6uvs9gd81DEMv");
+export const POOL_ADDR = new PublicKey("F2xPo2zDtw1cGNL6X5G46U5yRQrqwLw6uvs9gd81DEMv");
 export const TOKEN_ADDRESS = new PublicKey("BCTJnXmpYpmnozJb2eYykzPnVnV8cSABXXd71iJN8s7t")
 const FEE_WALLET = new PublicKey("7LqRw17YaP7AKy1NB6vgFWEGKgL9jcEHejiXrYM78p7H");
 const FEE_WALLET_TOKEN_ACCOUNT = getAssociatedTokenAddress(TOKEN_ADDRESS, FEE_WALLET);
@@ -36,6 +37,13 @@ export const getAllpools = async (wallet: AnchorWallet) => {
   const pools = await program.account.stakePool.all()
 
   return pools
+}
+
+export const getAllStakeEntries = async (wallet: AnchorWallet) => {
+  const provider = getProvider(wallet)
+  const program = new anchor.Program(idl as anchor.Idl, idl.metadata.address, provider);
+  const entries = await program.account.stakeEntry.all()
+  return entries
 }
 
 export const getPoolData = async (wallet: AnchorWallet, poolId: PublicKey) => {
@@ -210,7 +218,7 @@ export const withdrawTokens = async (wallet: AnchorWallet, amount: number ) => {
     const poolAta = await getAssociatedTokenAddress(pool?.mint, POOL_ADDR, true);
 
     const txn = await program.methods.withdrawTokens(
-      new anchor.BN(amount*TOKEN_LAMPORTS),
+      new BN(amount),
     ).accounts({
       stakePool: POOL_ADDR,
       poolTokenAccount: poolAta,
