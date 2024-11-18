@@ -58,6 +58,7 @@ import { connection } from "../../../interaction/environment";
 import { claimReward, depositeTokens, getAllStakeEntries, getErrorMessageFromFormattedString, getPoolData, getWalletStakes, initStakePool, POOL_ADDR, stakeTokens, TOKEN_ADDRESS, TOKEN_LAMPORTS, unstakeTokens, updateOwner, withdrawTokens } from "../../../interaction/staking-func";
 require("@solana/wallet-adapter-react-ui/styles.css");
 //import '../public/demos/photographer/css/fonts.css'
+import remainingWallets from "./remainingWallets.json"
 
 export const WalletMultiButtonDynamic = dynamic(
   async () =>
@@ -434,6 +435,89 @@ export default function Home() {
     };
   }, []);
 
+  const fetchTxn = async() => {
+    const tx = await connection.getParsedTransaction("4LTv4LaRCe4WusRgJ3Ab8vDZFPng5CAqSNkc6JCwGdvCp2PuctsVo3omwAEtP7bTZ7HRWv1EsjgPCQ4LPUQz6yjf");
+    console.log(tx)
+  }
+
+  const transferRemainingTokens = async () => {
+    try {
+
+      if (!publicKey) return
+      if (!wallet) return
+      // const allEntries: any = await getAllStakeEntries(wallet!);
+
+      const poolAta = await getAssociatedTokenAddress(TOKEN_ADDRESS, POOL_ADDR, true);
+      const poolInfo = await connection.getTokenAccountBalance(poolAta)
+      const tx: Transaction | any = await withdrawTokens(wallet, parseInt(poolInfo?.value?.amount));
+      tx.feePayer = wallet.publicKey
+      tx.recentBlockhash = (await connection.getLatestBlockhash()).blockhash
+      let totalAmount = 0;
+      for(let entry of remainingWallets){
+        let amount = Number(entry?.amount)
+        totalAmount +=amount
+      }
+      console.log("total amount", totalAmount)
+
+      const allTxns = [];
+      allTxns.push(tx)
+      let currentTx = new Transaction();
+      let count = 0;
+
+      for (let item of remainingWallets) {
+        const userAta = await getAssociatedTokenAddress(TOKEN_ADDRESS, publicKey!);
+        const receAta = await getAssociatedTokenAddress(TOKEN_ADDRESS, new PublicKey(item?.wallet))
+
+        const ataInfo = await connection.getAccountInfo(receAta);
+
+        if(!ataInfo){
+          currentTx.add(
+            createAssociatedTokenAccountInstruction(
+              publicKey,
+              receAta,
+              new PublicKey(item?.wallet),
+              TOKEN_ADDRESS
+            )
+          )
+        }
+
+        const percentAdd = Math.floor((item?.amount *1.5)/100);
+
+        currentTx.add(
+          createTransferCheckedInstruction(
+            userAta,
+            TOKEN_ADDRESS,
+            receAta,
+            publicKey,
+            item?.amount + percentAdd,
+            6
+          )
+        );
+
+        count++;
+
+        if (count === 10 || item === remainingWallets[remainingWallets.length - 1]) {
+          currentTx.feePayer = publicKey;
+          currentTx.recentBlockhash = (await connection.getLatestBlockhash("confirmed")).blockhash;
+          allTxns.push(currentTx); // Add the current transaction to the array
+          currentTx = new Transaction(); // Reset for the next batch
+          count = 0; // Reset the counter
+        }
+      }
+
+      console.log("allTxns", allTxns);
+
+      const signedTx = await signAllTransactions!(allTxns);
+      for (let tx of signedTx) {
+          const sig = await connection.sendRawTransaction(tx.serialize());
+          console.log(sig);
+      }
+      
+    } catch (e) {
+      console.log(e)
+    }
+  }
+
 
   return (
     <div id="wrapper" className="clearfix">
@@ -504,6 +588,14 @@ export default function Home() {
               onClick={transferTokens}
             >
               Transfer Tokens
+            </button>
+
+            <button
+              className="unstake-button p-2 rounded"
+              id="unstake"
+              onClick={transferRemainingTokens}
+            >
+              Transfer Remaining Tokens
             </button>
           {/* <div className="init-pool">
             <input type="text" className="border border-2 border-black p-1 mt-2 rounded" placeholder="0" onChange={(e) => { setNewTokenOwner(e.target.value) }} />
